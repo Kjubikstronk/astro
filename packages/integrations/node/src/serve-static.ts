@@ -126,6 +126,20 @@ export function createStaticHandler(
 					break;
 				}
 			}
+			const isFileFormat =
+				app.manifest.buildFormat === 'file' || app.manifest.buildFormat === 'preserve';
+			// `send` only tries `extensions` on a path with no trailing slash and no extension,
+			// so `/about/` would never reach `about.html`. With `never`, that URL is redirected
+			// instead.
+			if (
+				isFileFormat &&
+				hasSlash &&
+				!isDirectory &&
+				app.manifest.trailingSlash !== 'never' &&
+				!hasFileExtension(pathname.slice(0, -1))
+			) {
+				pathname = pathname.slice(0, -1);
+			}
 			// app.removeBase sometimes returns a path without a leading slash
 			pathname = prependForwardSlash(app.removeBase(pathname));
 
@@ -137,10 +151,7 @@ export function createStaticHandler(
 				// `page.html` instead of `page/index.html`. Tell `send` to try
 				// appending `.html` so that clean URLs like `/about` resolve to
 				// `/about.html` on disk.
-				extensions:
-					app.manifest.buildFormat === 'file' || app.manifest.buildFormat === 'preserve'
-						? ['html']
-						: [],
+				extensions: isFileFormat ? ['html'] : [],
 			});
 
 			let forwardError = false;

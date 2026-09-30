@@ -55,6 +55,15 @@ describe('build.format: file', () => {
 		assert.equal($('h1').text(), 'Two');
 	});
 
+	it('Can render prerendered route with a trailing slash', async () => {
+		const res = await fetch(`http://${server.host}:${server.port}/two/`);
+		const html = await res.text();
+		const $ = cheerio.load(html);
+
+		assert.equal(res.status, 200);
+		assert.equal($('h1').text(), 'Two');
+	});
+
 	it('Outputs pages as .html files, not directories', async () => {
 		assert.ok(fixture.pathExists('/client/two.html'));
 	});
@@ -95,6 +104,15 @@ describe('build.format: preserve', () => {
 
 	it('Can render prerendered route with clean URL', async () => {
 		const res = await fetch(`http://${server.host}:${server.port}/two`);
+		const html = await res.text();
+		const $ = cheerio.load(html);
+
+		assert.equal(res.status, 200);
+		assert.equal($('h1').text(), 'Two');
+	});
+
+	it('Can render prerendered route with a trailing slash', async () => {
+		const res = await fetch(`http://${server.host}:${server.port}/two/`);
 		const html = await res.text();
 		const $ = cheerio.load(html);
 
